@@ -1,0 +1,12 @@
+/* font-family outlined configuration */
+i {
+  font-family: "Material Icons Outlined" !important;
+}
+
+i.md-filled {
+  font-family: "Material Icons" !important;
+}
+
+i.md-outlined {
+  font-family: "Material Icons Outlined" !important;
+}
