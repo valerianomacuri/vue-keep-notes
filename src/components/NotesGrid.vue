@@ -1,6 +1,6 @@
 <template>
     <v-container v-if="notes" class="grey lighten-5 container">
-        <v-hover v-slot="{ isHovering, props }" v-for="note in notes" :key="note.id">
+        <v-hover v-slot="{ isHovering, props }" v-for="note in orderedNotes" :key="note.id">
             <v-card :elevation="isHovering ? 4 : 1" :class="{ 'on-hover': isHovering, 'card': true }" v-bind="props">
                 <v-card-title class="text-subtitle-1" style="font-weight: 500;">
                     {{ note.title }}
@@ -26,13 +26,14 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
 import { useDisplay } from 'vuetify/lib/framework.mjs';
 import { useDeleteNoteMutation, useNotesQuery } from "../hooks"
 
 const { name } = useDisplay()
 const { data: notes } = useNotesQuery()
 const { mutate: deleteNote, isLoading } = useDeleteNoteMutation()
-
+const orderedNotes = computed(() => notes.value?.slice().reverse() || [])
 
 </script>
 

@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { signInWithGoogle } from "../firebase/providers";
 import { useStorage } from "@vueuse/core";
 import _ from "lodash";
@@ -12,10 +12,22 @@ type User = {
   email: string;
 };
 const LOCAL_KEY_USERS = "u$3r$";
+const LOCAL_KEY_USER = "u$3r";
+
+const INITIAL_VALUE_USER = {
+  uid: null,
+};
+
+type DefaultUser = typeof INITIAL_VALUE_USER;
 
 export const useAuthStore = defineStore("auth", () => {
-  const user = ref<User | null>(null);
-  const status = ref<Status>("not-authenticated");
+  const user = useStorage<User | DefaultUser>(
+    LOCAL_KEY_USER,
+    INITIAL_VALUE_USER,
+    localStorage
+  );
+  const isAuth: Status = user.value.uid ? "authenticated" : "not-authenticated";
+  const status = ref<Status>(isAuth);
   const users = useStorage<User[]>(LOCAL_KEY_USERS, [], localStorage);
 
   const signIn = async () => {
@@ -27,7 +39,7 @@ export const useAuthStore = defineStore("auth", () => {
         .filter((u) => u.uid !== googleUser?.uid)
         .concat(googleUser as User);
     } else {
-      user.value = null;
+      user.value = INITIAL_VALUE_USER;
       status.value = "not-authenticated";
     }
   };
@@ -38,7 +50,7 @@ export const useAuthStore = defineStore("auth", () => {
       user.value = signedUser;
       status.value = "authenticated";
     } else {
-      user.value = null;
+      user.value = undefined;
       status.value = "not-authenticated";
     }
   };
